@@ -1,3 +1,4 @@
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -6,24 +7,34 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DebitCardApplication {
     private WebDriver driver;
 
     @BeforeAll
-    static void setUpAll() {
-        System.setProperty("webdriver.chrome.driver", "drive/win/chromedriver.exe");
+    public static void stepAll() {
+        WebDriverManager.chromedriver().setup();
     }
 
     @BeforeEach
-    void setUp() { driver = new ChromeDriver(); }
+    public void beforeEach() {
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--headless");
+        driver = new ChromeDriver(options);
+        driver.get("http://localhost:9999/");
+
+    }
 
     @AfterEach
-    void tearDown() {
+    public void afterEach() {
         driver.quit();
         driver = null;
     }
@@ -38,9 +49,10 @@ class DebitCardApplication {
         elements.get(1).sendKeys("+79610000000");
         driver.findElement(By.className("checkbox__box")).click();
         driver.findElement(By.className("button__content")).click();
-        String text = driver.findElement(By.className("Success_successBlock__2L3Cw")).getText();
-        assertEquals("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.", text.trim());
-        Thread.sleep(5000);
+        var actualTextElement = driver.findElement(By.cssSelector("[data-test-id=order-success]"));
+        var actualText = actualTextElement.getText().trim();
+        assertEquals("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.", actualText);
+        assertTrue(actualTextElement.isDisplayed());
     }
 
     @Test
@@ -53,9 +65,9 @@ class DebitCardApplication {
         elements.get(1).sendKeys("+79610000000");
         driver.findElement(By.className("checkbox__box")).click();
         driver.findElement(By.className("button__content")).click();
-        String text = driver.findElement(By.className("input__sub")).getText();
-        assertEquals("Поле обязательно для заполнения", text.trim());
-        Thread.sleep(5000);
+        assertEquals("Поле обязательно для заполнения",
+                driver.findElement(By.cssSelector("[data-test-id='name'].input_invalid .input__sub")).getText().trim());
+
     }
 
     @Test
@@ -70,7 +82,7 @@ class DebitCardApplication {
         driver.findElement(By.className("button__content")).click();
         String text = driver.findElements(By.className("input__sub")).get(1).getText();
         assertEquals("Поле обязательно для заполнения", text.trim());
-        Thread.sleep(5000);
+
     }
 
     @Test
@@ -84,7 +96,7 @@ class DebitCardApplication {
         driver.findElement(By.className("button__content")).click();
         String text = driver.findElements(By.className("input__sub")).get(1).getText();
         assertEquals("На указанный номер моб. тел. будет отправлен смс-код для подтверждения заявки на карту. Проверьте, что номер ваш и введен корректно.", text.trim());
-        Thread.sleep(5000);
+
     }
 
     @Test
@@ -99,7 +111,7 @@ class DebitCardApplication {
         driver.findElement(By.className("button__content")).click();
         String text = driver.findElement(By.className("input__sub")).getText();
         assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.", text.trim());
-        Thread.sleep(5000);
+
     }
 
     @Test
@@ -112,9 +124,11 @@ class DebitCardApplication {
         elements.get(1).sendKeys("+79610000000");
         driver.findElement(By.className("checkbox__box")).click();
         driver.findElement(By.className("button__content")).click();
-        String text = driver.findElement(By.className("input__sub")).getText();
-        assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.", text.trim());
-        Thread.sleep(5000);
+        var actualTextElement = driver.findElement(By.cssSelector("[data-test-id=order-success]"));
+        var actualText = actualTextElement.getText().trim();
+        assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.", actualText);
+        assertTrue(actualTextElement.isDisplayed());
+
     }
 
 

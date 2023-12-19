@@ -5,11 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,12 +40,12 @@ class DebitCardApplication {
 
     void checkingDebitCardApplication () throws InterruptedException {
 
+
         driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.className("input__control"));
-        elements.get(0).sendKeys("Иван Иванов");
-        elements.get(1).sendKeys("+79610000000");
-        driver.findElement(By.className("checkbox__box")).click();
-        driver.findElement(By.className("button__content")).click();
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Иван Иванов");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79610000000");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button.button")).click();
         var actualTextElement = driver.findElement(By.cssSelector("[data-test-id=order-success]"));
         var actualText = actualTextElement.getText().trim();
         assertEquals("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.", actualText);
@@ -60,11 +57,10 @@ class DebitCardApplication {
     void emptyNameFieldInTheDebitCardApplication () throws InterruptedException {
 
         driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.className("input__control"));
-        elements.get(0).sendKeys("");
-        elements.get(1).sendKeys("+79610000000");
-        driver.findElement(By.className("checkbox__box")).click();
-        driver.findElement(By.className("button__content")).click();
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys(" ");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79610000000");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button.button")).click();
         assertEquals("Поле обязательно для заполнения",
                 driver.findElement(By.cssSelector("[data-test-id='name'].input_invalid .input__sub")).getText().trim());
 
@@ -75,13 +71,12 @@ class DebitCardApplication {
     void emptyPhoneFieldInTheDebitCardApplication () throws InterruptedException {
 
         driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.className("input__control"));
-        elements.get(0).sendKeys("Иван Иванов");
-        elements.get(1).sendKeys(" ");
-        driver.findElement(By.className("checkbox__box")).click();
-        driver.findElement(By.className("button__content")).click();
-        String text = driver.findElements(By.className("input__sub")).get(1).getText();
-        assertEquals("Поле обязательно для заполнения", text.trim());
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Иван Иванов");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys(" ");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button.button")).click();
+        assertEquals("Поле обязательно для заполнения",
+                driver.findElement(By.cssSelector("[data-test-id='phone'].input_invalid .input__sub")).getText().trim());
 
     }
 
@@ -90,12 +85,12 @@ class DebitCardApplication {
     void checkboxNotSelected() throws InterruptedException {
 
         driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.className("input__control"));
-        elements.get(0).sendKeys("Иван Иванов");
-        elements.get(1).sendKeys("+79610000000");
-        driver.findElement(By.className("button__content")).click();
-        String text = driver.findElements(By.className("input__sub")).get(1).getText();
-        assertEquals("На указанный номер моб. тел. будет отправлен смс-код для подтверждения заявки на карту. Проверьте, что номер ваш и введен корректно.", text.trim());
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Иван Иванов");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79610000000");
+        driver.findElement(By.cssSelector("button.button")).click();
+        assertEquals("На указанный номер моб. тел. будет отправлен смс-код для подтверждения заявки на карту. Проверьте, что номер ваш и введен корректно.",
+                driver.findElement(By.cssSelector("[data-test-id='phone'] .input__sub")).getText().trim());
+
 
     }
 
@@ -104,13 +99,12 @@ class DebitCardApplication {
     void latNameFieldInDebitCardApplication () throws InterruptedException {
 
         driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.className("input__control"));
-        elements.get(0).sendKeys("Ivan Ivanov");
-        elements.get(1).sendKeys("+79610000000");
-        driver.findElement(By.className("checkbox__box")).click();
-        driver.findElement(By.className("button__content")).click();
-        String text = driver.findElement(By.className("input__sub")).getText();
-        assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.", text.trim());
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Ivan Ivanov");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79610000000");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button.button")).click();
+        assertEquals("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы.",
+                driver.findElement(By.cssSelector("[data-test-id='name'].input_invalid .input__sub")).getText().trim());
 
     }
 
@@ -119,15 +113,15 @@ class DebitCardApplication {
     void nameFieldWithoutSpace () throws InterruptedException {
 
         driver.get("http://localhost:9999/");
-        List<WebElement> elements = driver.findElements(By.className("input__control"));
-        elements.get(0).sendKeys("ИванИванов");
-        elements.get(1).sendKeys("+79610000000");
-        driver.findElement(By.className("checkbox__box")).click();
-        driver.findElement(By.className("button__content")).click();
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("ИванИванов");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79610000000");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button.button")).click();
         var actualTextElement = driver.findElement(By.cssSelector("[data-test-id=order-success]"));
         var actualText = actualTextElement.getText().trim();
         assertEquals("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.", actualText);
         assertTrue(actualTextElement.isDisplayed());
+
 
     }
 
